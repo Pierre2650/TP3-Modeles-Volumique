@@ -246,7 +246,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &30119920
 Transform:
   m_ObjectHideFlags: 0
@@ -393,10 +393,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Cube: {fileID: 10479618}
-  Sphere: {fileID: 30119919}
+  Sphere_Shape: {fileID: 0}
   useColliders: 0
-  deep: 4
-  radius: 1
+  deep: 3
+  spheres:
+  - {x: 0, y: 0, z: 0}
+  radius: 7
 --- !u!4 &68663101
 Transform:
   m_ObjectHideFlags: 0
@@ -465,7 +467,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &256816244
 Transform:
   m_ObjectHideFlags: 0
@@ -992,7 +994,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 10, y: 10, z: 10}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 2091357520}
@@ -1044,7 +1046,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2091357520
 Transform:
   m_ObjectHideFlags: 0
@@ -1054,7 +1056,7 @@ Transform:
   m_GameObject: {fileID: 2091357518}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 23.71, y: 0, z: 0}
+  m_LocalPosition: {x: 16.45, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1076,10 +1078,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Cube: {fileID: 1717927706}
-  Sphere: {fileID: 30119919}
-  useColliders: 1
-  deep: 4
-  radius: 5
+  Sphere_Shape: {fileID: 0}
+  useColliders: 0
+  deep: 3
+  spheres:
+  - {x: 0.5, y: 0.5, z: 0}
+  radius: 2
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

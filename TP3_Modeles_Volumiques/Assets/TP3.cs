@@ -6,10 +6,11 @@ public class TP3 : MonoBehaviour
 {
 
     public GameObject Cube;
-    public GameObject Sphere;
+    public GameObject Sphere_Shape;
     public bool useColliders = false;
     private List<GameObject> OcTree = new List<GameObject>();
     public int deep = 2;
+    public List<Vector3> spheres = new List<Vector3>();
 
     public float radius = 5.0f;
 
@@ -19,7 +20,7 @@ public class TP3 : MonoBehaviour
         Vector3 newScale = Cube.transform.localScale ;
         Vector3 startPosReference = Cube.transform.position;
         divideCube(newScale, startPosReference, 0);
-        Cube.SetActive(false);
+        Cube.GetComponent<MeshRenderer>().enabled = false;
     }
 
   
@@ -93,13 +94,30 @@ public class TP3 : MonoBehaviour
     {
         GameObject newCube = Instantiate(Cube, position, Quaternion.identity, Cube.transform.parent);
         newCube.transform.localScale = new Vector3(scale.x, scale.y, Mathf.Abs(scale.z));
-        if (useColliders) { newCube.AddComponent<checkCollision>();  }
-        
+        if (useColliders) { newCube.AddComponent<checkCollision>(); return; }
 
-        Vector3 sphereRadius = Cube.transform.position + Vector3.forward * radius;
-        Vector3 voxelPos = newCube.transform.position - Cube.transform.position;
+        bool destroy = true;
 
-        if(voxelPos.magnitude > sphereRadius.magnitude && !useColliders)
+        foreach (Vector3 sph in spheres) {
+
+            Vector3 sphereCenter = Cube.transform.TransformPoint(sph);
+            Vector3 sphereSurfacePoint = sphereCenter + Vector3.forward * radius;
+
+            Vector3 voxelPos = newCube.transform.position - sphereCenter;
+
+
+
+            if (voxelPos.magnitude < radius)
+            {
+                destroy = false;
+                break;
+            
+
+            }
+
+        }
+
+        if (destroy)
         {
             Destroy(newCube);
         }
@@ -107,6 +125,7 @@ public class TP3 : MonoBehaviour
         {
             OcTree.Add(newCube);
         }
+
 
 
 
