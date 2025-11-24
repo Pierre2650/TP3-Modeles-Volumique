@@ -1,64 +1,117 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class TP3 : MonoBehaviour
 {
 
     public GameObject Cube;
-    private List<GameObject[]> Tree = new List<GameObject[]>();
+    public GameObject Sphere;
+    public bool useColliders = false;
+    private List<GameObject> OcTree = new List<GameObject>();
+    public int deep = 2;
+
+    public float radius = 5.0f;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-       
-        divideCube(Cube,0);
-
-
+        Vector3 newScale = Cube.transform.localScale ;
+        Vector3 startPosReference = Cube.transform.position;
+        divideCube(newScale, startPosReference, 0);
+        Cube.SetActive(false);
     }
 
-
-    private void divideCube(GameObject aCube, int iteration)
+  
+    private void divideCube(Vector3 newScale, Vector3 newStartPosition, int iteration)
     {
-        if (iteration == 2) { return; }
 
-        Vector3 newScale = aCube.transform.localScale / 2;
-        Vector3 startPosReference = aCube.transform.position;
-        GameObject[] Cubes = new GameObject[8];
 
-        for (int i = 0; i < 8; i += 4)
+        newScale /= 2;
+
+        if (iteration == deep) {
+
+
+            for (int i = 0; i < 8; i += 4)
+            {
+                Vector3 spawnPosition = new Vector3(newStartPosition.x + newScale.x / 2, newStartPosition.y + newScale.y / 2, newStartPosition.z + newScale.z / 2);
+                createVoxelShape(newScale, spawnPosition);
+
+                spawnPosition = new Vector3(spawnPosition.x - newScale.x, spawnPosition.y, spawnPosition.z);
+                createVoxelShape(newScale, spawnPosition);
+
+
+                spawnPosition = new Vector3(newStartPosition.x + newScale.x / 2, newStartPosition.y + newScale.y / 2 - newScale.y, newStartPosition.z + newScale.z / 2);
+                createVoxelShape(newScale, spawnPosition);
+   
+
+                spawnPosition = new Vector3(spawnPosition.x - newScale.x, spawnPosition.y, spawnPosition.z);
+                createVoxelShape(newScale, spawnPosition);
+   
+
+
+                newScale = new Vector3(newScale.x, newScale.y, -newScale.z);
+
+                
+            }
+
+
+        }
+        else
         {
-            Vector3 spawnPosition = new Vector3(startPosReference.x + newScale.x / 2, startPosReference.y + newScale.y / 2, startPosReference.z + newScale.z / 2);
-            GameObject newCube = Instantiate(Cube, spawnPosition, Quaternion.identity, Cube.transform.parent);
-            newCube.transform.localScale = newScale;
-            Cubes[i] = newCube;
-            divideCube(newCube,iteration+1);
+            
 
-            spawnPosition = new Vector3(spawnPosition.x - newScale.x, spawnPosition.y, spawnPosition.z);
-            newCube = Instantiate(Cube, spawnPosition, Quaternion.identity, Cube.transform.parent);
-            newCube.transform.localScale = newScale;
-            Cubes[i+1] = newCube;
-            divideCube(newCube, iteration + 1);
+            //newStartPosition = new Vector3( newStartPosition.x + newScale.x / 2, newStartPosition.y + newScale.y / 2, newStartPosition.z + newScale.z / 2);
 
-            spawnPosition = new Vector3(startPosReference.x + newScale.x / 2, startPosReference.y +  newScale.y / 2 - newScale.y, startPosReference.z + newScale.z / 2);
-            newCube = Instantiate(Cube, spawnPosition, Quaternion.identity, Cube.transform.parent);
-            newCube.transform.localScale = newScale;
-            Cubes[i+2] = newCube;
-            divideCube(newCube, iteration + 1);
+            
 
-            spawnPosition = new Vector3(spawnPosition.x - newScale.x, spawnPosition.y, spawnPosition.z);
-            newCube = Instantiate(Cube, spawnPosition, Quaternion.identity, Cube.transform.parent);
-            newCube.transform.localScale = newScale;
-            Cubes[i+3] = newCube;
-            divideCube(newCube, iteration + 1);
+            for (int i = 0; i < 8; i += 4)
+            {
+                Vector3 spawnPosition = new Vector3(newStartPosition.x + newScale.x / 2, newStartPosition.y + newScale.y / 2, newStartPosition.z + newScale.z / 2);
+                divideCube(newScale, spawnPosition, iteration + 1);
 
-            newScale = new Vector3(newScale.x, newScale.y, -newScale.z);
+                spawnPosition = new Vector3(spawnPosition.x - newScale.x, spawnPosition.y, spawnPosition.z);
+                divideCube(newScale, spawnPosition, iteration + 1);
 
-            //iteration++; //temp
+                spawnPosition = new Vector3(newStartPosition.x + newScale.x / 2, newStartPosition.y + newScale.y / 2 - newScale.y, newStartPosition.z + newScale.z / 2);
+                divideCube(newScale, spawnPosition, iteration + 1);
+
+                spawnPosition = new Vector3(spawnPosition.x - newScale.x, spawnPosition.y, spawnPosition.z);
+                divideCube(newScale, spawnPosition, iteration + 1);
+
+
+                newScale = new Vector3(newScale.x, newScale.y, -newScale.z);
+
+
+            }
         }
 
-        //Tree.Add(Cubes);
 
     }
+
+    private void createVoxelShape(Vector3 scale, Vector3 position)
+    {
+        GameObject newCube = Instantiate(Cube, position, Quaternion.identity, Cube.transform.parent);
+        newCube.transform.localScale = new Vector3(scale.x, scale.y, Mathf.Abs(scale.z));
+        if (useColliders) { newCube.AddComponent<checkCollision>();  }
+        
+
+        Vector3 sphereRadius = Cube.transform.position + Vector3.forward * radius;
+        Vector3 voxelPos = newCube.transform.position - Cube.transform.position;
+
+        if(voxelPos.magnitude > sphereRadius.magnitude && !useColliders)
+        {
+            Destroy(newCube);
+        }
+        else
+        {
+            OcTree.Add(newCube);
+        }
+
+
+
+    }
+
 
     // Update is called once per frame
     void Update()
