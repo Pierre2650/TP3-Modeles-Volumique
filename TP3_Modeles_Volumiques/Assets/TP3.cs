@@ -4,15 +4,26 @@ using UnityEngine;
 
 public class TP3 : MonoBehaviour
 {
+    public enum Operateur
+    {
+        Union,
+        Intersection,
+        Difference
+    }
 
     public GameObject Cube;
     public GameObject Sphere_Shape;
     public bool useColliders = false;
     private List<GameObject> OcTree = new List<GameObject>();
+    
+    [Range(0.0f, 1)]
+    public float size = 1.0f;
+    
     public int deep = 2;
     public List<Vector3> spheres = new List<Vector3>();
-
     public float radius = 5.0f;
+
+    public Operateur operateur = Operateur.Union;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -21,6 +32,8 @@ public class TP3 : MonoBehaviour
         Vector3 startPosReference = Cube.transform.position;
         divideCube(newScale, startPosReference, 0);
         Cube.GetComponent<MeshRenderer>().enabled = false;
+        size = OcTree[0].transform.localScale.x;
+
     }
 
   
@@ -62,9 +75,7 @@ public class TP3 : MonoBehaviour
         {
             
 
-            //newStartPosition = new Vector3( newStartPosition.x + newScale.x / 2, newStartPosition.y + newScale.y / 2, newStartPosition.z + newScale.z / 2);
-
-            
+       
 
             for (int i = 0; i < 8; i += 4)
             {
@@ -97,25 +108,54 @@ public class TP3 : MonoBehaviour
         if (useColliders) { newCube.AddComponent<checkCollision>(); return; }
 
         bool destroy = true;
+        int nbIntersections = 0;
 
         foreach (Vector3 sph in spheres) {
 
             Vector3 sphereCenter = Cube.transform.TransformPoint(sph);
-            Vector3 sphereSurfacePoint = sphereCenter + Vector3.forward * radius;
-
             Vector3 voxelPos = newCube.transform.position - sphereCenter;
 
 
+            if (voxelPos.magnitude < radius && destroy)
+            {
+                nbIntersections++;
+            }
 
-            if (voxelPos.magnitude < radius)
+            if (operateur == Operateur.Union)
+            {
+
+
+                if (nbIntersections > 0)
+                {
+                    destroy = false;
+                    break;
+
+                }
+
+            }
+        }
+
+        if (operateur == Operateur.Intersection)
+        {
+
+            if (nbIntersections > 1 )
             {
                 destroy = false;
-                break;
-            
+               
+            }
+
+        }
+        else if  (operateur == Operateur.Difference)
+        {
+
+            if (nbIntersections == 1)
+            {
+                destroy = false;
 
             }
 
         }
+
 
         if (destroy)
         {
@@ -123,6 +163,9 @@ public class TP3 : MonoBehaviour
         }
         else
         {
+            newCube.AddComponent<TP3_Potentiel_Manager>();
+            int p = Random.Range(1, 6);
+            newCube.GetComponent<TP3_Potentiel_Manager>().potentiel = p; 
             OcTree.Add(newCube);
         }
 
@@ -135,6 +178,18 @@ public class TP3 : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+      
+            updateSize();
+       
+
+
+    }
+
+
+    void updateSize()
+    {
+        foreach (GameObject obj in OcTree) {
+            obj.transform.localScale = new Vector3(size,size, size);
+        }
     }
 }
