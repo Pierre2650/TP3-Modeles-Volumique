@@ -1,6 +1,6 @@
 # Volumetric Modeling
 ## Voxel Modeling
-Projet Unity pour for the generation of voxel shapes.
+Unity project for generating voxel-based shapes.
 
 ## Description
 This directory contains the source code of a Unity project in which I developed scripts for generating voxel-based spheres.
